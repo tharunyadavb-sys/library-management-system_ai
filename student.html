@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a href="login.html">Logout</a>
+
+<script>
+    const role = localStorage.getItem("role");
+
+    if (role !== "student") {
+        alert("Access denied");
+        window.location.href = "login.html";
+    }
+</script>
+
+<h2>Student Dashboard</h2>
+
+<h3>Select Books</h3>
+<button onclick="loadBooks()">Load Books</button>
+
+<ul id="bookList"></ul>
+
+<br><br>
+
+<h3>Select Dates</h3>
+From: <input type="date" id="fromDate"><br><br>
+To: <input type="date" id="toDate"><br><br>
+
+<button onclick="borrowBooks()">Borrow Selected Books</button>
+
+<hr>
+
+<h3>My Borrowed Books</h3>
+<button onclick="loadMyBooks()">Load My Books</button>
+<ul id="myBooks"></ul>
+<h3>History</h3>
+<button onclick="loadHistory()">Load History</button>
+<ul id="history"></ul>
+
+<script>
+const user = JSON.parse(localStorage.getItem("user"));
+
+// Load books with checkbox
+async function loadBooks() {
+    const res = await fetch('http://localhost:3000/getBooks');
+    const data = await res.json();
+
+    const list = document.getElementById('bookList');
+    list.innerHTML = "";
+
+    data.forEach(book => {
+        const li = document.createElement('li');
+
+        li.innerHTML = `
+            <input type="checkbox" value="${book._id}">
+            ${book.title}
+        `;
+
+        list.appendChild(li);
+    });
+}
+
+// Borrow multiple books
+async function borrowBooks() {
+    const checkboxes = document.querySelectorAll('#bookList input:checked');
+
+    const fromDate = document.getElementById('fromDate').value;
+    const toDate = document.getElementById('toDate').value;
+
+    if (checkboxes.length === 0) {
+        alert("Select at least one book");
+        return;
+    }
+
+    if (!fromDate || !toDate) {
+        alert("Select dates");
+        return;
+    }
+
+    for (let cb of checkboxes) {
+        await fetch('http://localhost:3000/issueBook', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                studentId: user._id,
+                bookId: cb.value,
+                fromDate,
+                toDate
+            })
+        });
+    }
+
+    alert("Books Borrowed");
+}
+
+// Load borrowed books
+async function loadMyBooks() {
+    const res = await fetch(`http://localhost:3000/myBooks/${user._id}`);
+    const data = await res.json();
+
+    const list = document.getElementById('myBooks');
+    list.innerHTML = "";
+
+    data.forEach(item => {
+        const li = document.createElement('li');
+
+        const from = new Date(item.fromDate).toDateString();
+        const to = new Date(item.toDate).toDateString();
+
+        li.innerHTML = `
+            ${item.title} | From: ${from} | To: ${to}
+            <button onclick="returnBook('${item._id}')">Return</button>
+        `;
+
+        list.appendChild(li);
+    });
+
+
+}
+async function returnBook(id) {
+    await fetch(`http://localhost:3000/returnBook/${id}`, {
+        method: 'PUT'
+    });
+
+    alert("Book Returned");
+
+    loadMyBooks();
+}
+async function loadHistory() {
+    const res = await fetch(`http://localhost:3000/history/${user._id}`);
+    const data = await res.json();
+
+    const list = document.getElementById('history');
+    list.innerHTML = "";
+
+    data.forEach(item => {
+        const li = document.createElement('li');
+
+        const from = new Date(item.fromDate).toDateString();
+        const to = new Date(item.toDate).toDateString();
+
+        li.innerText = `${item.title} | From: ${from} | To: ${to}`;
+
+        list.appendChild(li);
+    });
+}
+</script>
+
+</body>
+</html>

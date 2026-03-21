@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Forgot Password</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h2>Forgot Password</h2>
+
+<input id="email" placeholder="Enter Email"><br><br>
+<button onclick="sendOtp()">Send OTP</button>
+
+<br><br>
+
+<input id="otp" placeholder="Enter OTP"><br><br>
+<input id="newPassword" placeholder="New Password"><br><br>
+
+<button onclick="resetPassword()">Reset Password</button>
+
+<script>
+async function sendOtp() {
+    const email = document.getElementById('email').value;
+
+    const res = await fetch('http://localhost:3000/sendOtp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+    });
+
+    const data = await res.json();
+alert("Your OTP is: " + data.otp);
+}
+
+async function resetPassword() {
+    const email = document.getElementById('email').value;
+    const otp = document.getElementById('otp').value;
+    const newPassword = document.getElementById('newPassword').value;
+
+    const res = await fetch('http://localhost:3000/resetPassword', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp, newPassword })
+    });
+
+    const msg = await res.text();
+alert(msg);
+
+if (msg === "Password updated successfully") {
+    window.location.href = "login.html";   // ✅ redirect
+}
+}
+</script>
+
+</body>
+</html>

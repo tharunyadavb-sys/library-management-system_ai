@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<a href="login.html">Logout</a>
+
+<script>
+    const role = localStorage.getItem("role");
+
+    if (role !== "admin") {
+        alert("Access denied");
+        window.location.href = "login.html";
+    }
+</script>
+
+<h2>Admin Dashboard</h2>
+
+<h3>Add Book</h3>
+
+<input id="title" placeholder="Title"><br><br>
+<input id="author" placeholder="Author"><br><br>
+<input id="category" placeholder="Category"><br><br>
+<input id="stock" placeholder="Stock"><br><br>
+
+<button onclick="addBook()">Add Book</button>
+
+<hr>
+
+<h3>All Books</h3>
+
+<button onclick="loadBooks()">Load Books</button>
+
+<ul id="bookList"></ul>
+
+<script>
+async function addBook() {
+    const title = document.getElementById('title').value;
+    const author = document.getElementById('author').value;
+    const category = document.getElementById('category').value;
+    const stock = document.getElementById('stock').value;
+
+    await fetch('http://localhost:3000/addBook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, author, category, stock })
+    });
+
+    alert("Book Added");
+    loadBooks();
+}
+
+async function loadBooks() {
+    const res = await fetch('http://localhost:3000/getBooks');
+    const data = await res.json();
+
+    const list = document.getElementById('bookList');
+    list.innerHTML = "";
+
+    data.forEach(book => {
+        const li = document.createElement('li');
+
+        li.innerHTML = `
+            ${book.title} - ${book.author}
+            <button onclick="deleteBook('${book._id}')">Delete</button>
+            <button onclick="editBook('${book._id}', '${book.title}', '${book.author}', '${book.category}', '${book.stock}')">Edit</button>
+        `;
+
+        list.appendChild(li);
+    });
+}
+
+async function deleteBook(id) {
+    await fetch(`http://localhost:3000/deleteBook/${id}`, {
+        method: 'DELETE'
+    });
+
+    alert("Book Deleted");
+    loadBooks();
+}
+
+async function editBook(id, title, author, category, stock) {
+    const newTitle = prompt("Enter new title", title);
+    const newAuthor = prompt("Enter new author", author);
+    const newCategory = prompt("Enter new category", category);
+    const newStock = prompt("Enter new stock", stock);
+
+    await fetch(`http://localhost:3000/updateBook/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            title: newTitle,
+            author: newAuthor,
+            category: newCategory,
+            stock: newStock
+        })
+    });
+
+    alert("Book Updated");
+    loadBooks();
+}
+</script>
+
+</body>
+</html>
