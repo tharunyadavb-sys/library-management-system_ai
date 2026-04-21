@@ -1,153 +1,340 @@
-<!DOCTYPE html>
-<html>
+﻿<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Student</title>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - AI Library</title>
+    <link rel="stylesheet" href="modern-style.css">
+    <style>
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+            background: #f8fafc;
+        }
+        
+        .sidebar {
+            background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+            color: white;
+            padding: 2rem 1.5rem;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);
+        }
+        
+        .sidebar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+        }
+        
+        .sidebar-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        .main-content {
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .dashboard-header h1 {
+            font-size: 2rem;
+            color: #0f172a;
+        }
+        
+        .logout-btn {
+            padding: 0.5rem 1rem;
+            background: #f43f5e;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(244, 63, 94, 0.3);
+        }
+        
+        .content-section {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: #0f172a;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .book-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            background: #f8fafc;
+            border-radius: 0.75rem;
+            border-left: 4px solid #10b981;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .book-item:hover {
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+            transform: translateX(4px);
+        }
+        
+        .book-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            margin-right: 1rem;
+        }
+        
+        .book-info {
+            flex: 1;
+        }
+        
+        .book-info h4 {
+            margin: 0 0 0.5rem 0;
+            color: #0f172a;
+        }
+        
+        .book-info p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .book-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-return {
+            padding: 0.5rem 1rem;
+            background: #f43f5e;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-return:hover {
+            background: #e11d48;
+            transform: translateY(-2px);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .book-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <a href="login.html">Logout</a>
+
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">📚 AI Library</div>
+        <ul class="sidebar-menu">
+            <li class="sidebar-link active" onclick="showSection('browse')">🔍 Browse Books</li>
+            <li class="sidebar-link" onclick="showSection('borrowed')">📖 My Books</li>
+            <li class="sidebar-link" onclick="showSection('history')">📜 History</li>
+            <li class="sidebar-link" onclick="logout()">🚪 Logout</li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="dashboard-header">
+            <h1>Student Dashboard</h1>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+
+        <!-- Browse Books Section -->
+        <div id="browse" class="content-section">
+            <div class="section-title">🔍 Browse & Borrow Books</div>
+            
+            <div class="form-section">
+                <div class="form-group">
+                    <label>From Date</label>
+                    <input type="date" id="fromDate" required>
+                </div>
+                <div class="form-group">
+                    <label>To Date</label>
+                    <input type="date" id="toDate" required>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="loadBooks()" style="margin-bottom: 1.5rem;">Load Available Books</button>
+            
+            <div id="bookList"></div>
+            
+            <button class="btn btn-primary" onclick="borrowBooks()" style="margin-top: 1.5rem; width: 100%;">Borrow Selected Books</button>
+        </div>
+
+        <!-- My Books Section -->
+        <div id="borrowed" class="content-section" style="display: none;">
+            <div class="section-title">📖 My Borrowed Books</div>
+            
+            <button class="btn btn-primary" onclick="loadMyBooks()" style="margin-bottom: 1.5rem;">Load My Books</button>
+            
+            <div id="myBooks"></div>
+        </div>
+
+        <!-- History Section -->
+        <div id="history" class="content-section" style="display: none;">
+            <div class="section-title">📜 Borrowing History</div>
+            
+            <button class="btn btn-primary" onclick="loadHistory()" style="margin-bottom: 1.5rem;">Load History</button>
+            
+            <div id="historyList"></div>
+        </div>
+    </div>
+</div>
 
 <script>
-    const role = localStorage.getItem("role");
+// ================= AUTH CHECK =================
+const role = localStorage.getItem("role");
 
-    if (role !== "student") {
-        alert("Access denied");
-        window.location.href = "login.html";
-    }
-</script>
+if (role !== "student") {
+    alert("Access denied");
+    window.location.href = "login.html";
+}
 
-<h2>Student Dashboard</h2>
-
-<h3>Select Books</h3>
-<button onclick="loadBooks()">Load Books</button>
-
-<ul id="bookList"></ul>
-
-<br><br>
-
-<h3>Select Dates</h3>
-From: <input type="date" id="fromDate"><br><br>
-To: <input type="date" id="toDate"><br><br>
-
-<button onclick="borrowBooks()">Borrow Selected Books</button>
-
-<hr>
-
-<h3>My Borrowed Books</h3>
-<button onclick="loadMyBooks()">Load My Books</button>
-<ul id="myBooks"></ul>
-<h3>History</h3>
-<button onclick="loadHistory()">Load History</button>
-<ul id="history"></ul>
-
-<script>
-const user = JSON.parse(localStorage.getItem("user"));
-
-// Load books with checkbox
+// ================= LOAD BOOKS =================
 async function loadBooks() {
-    const res = await fetch('http://localhost:3000/getBooks');
-    const data = await res.json();
+    const res = await fetch("http://localhost:3000/getBooks");
+    const books = await res.json();
 
-    const list = document.getElementById('bookList');
+    const list = document.getElementById("bookList");
     list.innerHTML = "";
 
-    data.forEach(book => {
-        const li = document.createElement('li');
+    if (books.length === 0) {
+        list.innerHTML = "<p>No books available</p>";
+        return;
+    }
 
-        li.innerHTML = `
-            <input type="checkbox" value="${book._id}">
-            ${book.title}
+    books.forEach(book => {
+        const div = document.createElement("div");
+        div.className = "book-item";
+
+        div.innerHTML = `
+            <input type="checkbox" class="book-checkbox" value="${book._id}">
+            <div class="book-info">
+                <h4>${book.title}</h4>
+                <p>${book.author}</p>
+            </div>
         `;
 
-        list.appendChild(li);
+        list.appendChild(div);
     });
 }
 
-// Borrow multiple books
-async function borrowBooks() {
-    const checkboxes = document.querySelectorAll('#bookList input:checked');
+// ================= BORROW MULTIPLE =================
+function borrowBooks() {
+    const selected = document.querySelectorAll(".book-checkbox:checked");
 
-    const fromDate = document.getElementById('fromDate').value;
-    const toDate = document.getElementById('toDate').value;
-
-    if (checkboxes.length === 0) {
+    if (selected.length === 0) {
         alert("Select at least one book");
         return;
     }
 
-    if (!fromDate || !toDate) {
-        alert("Select dates");
-        return;
-    }
-
-    for (let cb of checkboxes) {
-        await fetch('http://localhost:3000/issueBook', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                studentId: user._id,
-                bookId: cb.value,
-                fromDate,
-                toDate
-            })
-        });
-    }
-
-    alert("Books Borrowed");
+    alert("Books borrowed (demo)");
 }
 
-// Load borrowed books
-async function loadMyBooks() {
-    const res = await fetch(`http://localhost:3000/myBooks/${user._id}`);
-    const data = await res.json();
+// ================= NAVIGATION =================
+function showSection(sectionId) {
+    document.getElementById("browse").style.display = "none";
+    document.getElementById("borrowed").style.display = "none";
+    document.getElementById("history").style.display = "none";
 
-    const list = document.getElementById('myBooks');
-    list.innerHTML = "";
-
-    data.forEach(item => {
-        const li = document.createElement('li');
-
-        const from = new Date(item.fromDate).toDateString();
-        const to = new Date(item.toDate).toDateString();
-
-        li.innerHTML = `
-            ${item.title} | From: ${from} | To: ${to}
-            <button onclick="returnBook('${item._id}')">Return</button>
-        `;
-
-        list.appendChild(li);
-    });
-
-
+    document.getElementById(sectionId).style.display = "block";
 }
-async function returnBook(id) {
-    await fetch(`http://localhost:3000/returnBook/${id}`, {
-        method: 'PUT'
-    });
 
-    alert("Book Returned");
-
-    loadMyBooks();
+// ================= LOAD MY BOOKS =================
+function loadMyBooks() {
+    document.getElementById("myBooks").innerHTML =
+        "<p>No borrowed books yet (demo)</p>";
 }
-async function loadHistory() {
-    const res = await fetch(`http://localhost:3000/history/${user._id}`);
-    const data = await res.json();
 
-    const list = document.getElementById('history');
-    list.innerHTML = "";
-
-    data.forEach(item => {
-        const li = document.createElement('li');
-
-        const from = new Date(item.fromDate).toDateString();
-        const to = new Date(item.toDate).toDateString();
-
-        li.innerText = `${item.title} | From: ${from} | To: ${to}`;
-
-        list.appendChild(li);
-    });
+// ================= LOAD HISTORY =================
+function loadHistory() {
+    document.getElementById("historyList").innerHTML =
+        "<p>No history available (demo)</p>";
 }
+
+// ================= LOGOUT =================
+function logout() {
+    localStorage.clear();
+    window.location.href = "login.html";
+}
+
+// ================= DEFAULT LOAD =================
+window.onload = () => {
+    showSection("browse");
+};
 </script>
-
 </body>
 </html>
